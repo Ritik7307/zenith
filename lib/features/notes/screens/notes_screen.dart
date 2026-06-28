@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import '../../core/repositories/note_repository.dart';
-import '../../core/models/note.dart';
+import '../../../core/repositories/note_repository.dart';
+import '../../../core/models/note.dart';
 
 class NotesScreen extends ConsumerStatefulWidget {
   const NotesScreen({super.key});

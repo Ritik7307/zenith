@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import '../../core/repositories/event_repository.dart';
-import '../../core/models/scheduled_event.dart';
+import '../../../core/repositories/event_repository.dart';
+import '../../../core/models/scheduled_event.dart';
 
 class EventsScreen extends ConsumerStatefulWidget {
   const EventsScreen({super.key});
