@@ -25,7 +25,7 @@ class NotificationService {
       iOS: initializationSettingsDarwin,
     );
 
-    await _flutterLocalNotificationsPlugin.initialize(initializationSettings);
+    await _flutterLocalNotificationsPlugin.initialize(settings: initializationSettings);
   }
 
   Future<void> scheduleNotification({
@@ -58,15 +58,15 @@ class NotificationService {
     // Using a delay for simplicity, though zonedSchedule is recommended.
     Future.delayed(difference, () {
       _flutterLocalNotificationsPlugin.show(
-        id,
-        title,
-        body,
-        platformChannelSpecifics,
+        id: id,
+        title: title,
+        body: body,
+        notificationDetails: platformChannelSpecifics,
       );
     });
   }
 
   Future<void> cancelNotification(int id) async {
-    await _flutterLocalNotificationsPlugin.cancel(id);
+    await _flutterLocalNotificationsPlugin.cancel(id: id);
   }
 }
