@@ -127,47 +127,72 @@ class GoalsScreen extends ConsumerWidget {
   void _showAddGoalDialog(BuildContext context, WidgetRef ref) {
     final titleController = TextEditingController();
     final descController = TextEditingController();
+    DateTime? selectedDate = DateTime.now().add(const Duration(days: 30));
 
     showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          title: const Text('Add Long Term Goal'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: titleController,
-                decoration: const InputDecoration(hintText: 'Goal Title'),
-                autofocus: true,
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('Add Long Term Goal'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: titleController,
+                    decoration: const InputDecoration(hintText: 'Goal Title'),
+                    autofocus: true,
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: descController,
+                    decoration: const InputDecoration(hintText: 'Description'),
+                    maxLines: 3,
+                  ),
+                  const SizedBox(height: 16),
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: const Text('Target Date'),
+                    subtitle: Text(
+                      selectedDate != null 
+                          ? '${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}'
+                          : 'Select a date',
+                    ),
+                    trailing: const Icon(Icons.calendar_today),
+                    onTap: () async {
+                      final date = await showDatePicker(
+                        context: context,
+                        initialDate: selectedDate ?? DateTime.now().add(const Duration(days: 1)),
+                        firstDate: DateTime.now(),
+                        lastDate: DateTime.now().add(const Duration(days: 365 * 10)),
+                      );
+                      if (date != null) {
+                        setState(() => selectedDate = date);
+                      }
+                    },
+                  ),
+                ],
               ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: descController,
-                decoration: const InputDecoration(hintText: 'Description'),
-                maxLines: 3,
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => context.pop(),
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                final title = titleController.text.trim();
-                final desc = descController.text.trim();
-                if (title.isNotEmpty) {
-                  // For simplicity, we just set a deadline 30 days from now
-                  final deadline = DateTime.now().add(const Duration(days: 30));
-                  ref.read(activeGoalsProvider.notifier).addGoal(title, desc, deadline);
-                }
-                context.pop();
-              },
-              child: const Text('Add Goal'),
-            ),
-          ],
+              actions: [
+                TextButton(
+                  onPressed: () => context.pop(),
+                  child: const Text('Cancel'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    final title = titleController.text.trim();
+                    final desc = descController.text.trim();
+                    if (title.isNotEmpty && selectedDate != null) {
+                      ref.read(activeGoalsProvider.notifier).addGoal(title, desc, selectedDate!);
+                      context.pop();
+                    }
+                  },
+                  child: const Text('Add Goal'),
+                ),
+              ],
+            );
+          },
         );
       },
     );

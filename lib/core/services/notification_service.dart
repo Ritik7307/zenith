@@ -1,5 +1,9 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:timezone/data/latest_all.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
+
+import 'package:flutter_timezone/flutter_timezone.dart';
 
 final notificationServiceProvider = Provider<NotificationService>((ref) {
   return NotificationService();
@@ -10,6 +14,10 @@ class NotificationService {
       FlutterLocalNotificationsPlugin();
 
   Future<void> init() async {
+    tz.initializeTimeZones();
+    final timeZoneName = (await FlutterTimezone.getLocalTimezone()).identifier;
+    tz.setLocalLocation(tz.getLocation(timeZoneName));
+
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('@mipmap/ic_launcher');
 
@@ -25,7 +33,21 @@ class NotificationService {
       iOS: initializationSettingsDarwin,
     );
 
-    await _flutterLocalNotificationsPlugin.initialize(settings: initializationSettings);
+    await _flutterLocalNotificationsPlugin.initialize(
+      settings: initializationSettings,
+      onDidReceiveNotificationResponse: (details) {},
+    );
+    
+    // Request Android 13 permissions
+    await _flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.requestNotificationsPermission();
+        
+    await _flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.requestExactAlarmsPermission();
   }
 
   Future<void> scheduleNotification({
@@ -34,11 +56,6 @@ class NotificationService {
     required String body,
     required DateTime scheduledDate,
   }) async {
-    // Note: In a production app, use timezone aware scheduling (zonedSchedule).
-    // For simplicity, we are using the basic show or a delayed show if possible, 
-    // but the flutter_local_notifications package requires timezone setup for actual scheduling.
-    // We'll just show it immediately for demo, or you can implement timezone package.
-    
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
       'events_channel',
@@ -51,19 +68,16 @@ class NotificationService {
     const NotificationDetails platformChannelSpecifics =
         NotificationDetails(android: androidPlatformChannelSpecifics);
 
-    final difference = scheduledDate.difference(DateTime.now());
-    
-    if (difference.isNegative) return;
+    if (scheduledDate.isBefore(DateTime.now())) return;
 
-    // Using a delay for simplicity, though zonedSchedule is recommended.
-    Future.delayed(difference, () {
-      _flutterLocalNotificationsPlugin.show(
-        id: id,
-        title: title,
-        body: body,
-        notificationDetails: platformChannelSpecifics,
-      );
-    });
+    await _flutterLocalNotificationsPlugin.zonedSchedule(
+      id: id,
+      title: title,
+      body: body,
+      scheduledDate: tz.TZDateTime.from(scheduledDate, tz.local),
+      notificationDetails: platformChannelSpecifics,
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+    );
   }
 
   Future<void> cancelNotification(int id) async {

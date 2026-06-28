@@ -63,6 +63,34 @@ class TimetableNotifier extends StateNotifier<AsyncValue<List<TimetableEntry>>> 
     }
   }
 
+  Future<void> updateEntry({
+    required TimetableEntry entry,
+    required String subjectName,
+    required String location,
+    required int dayOfWeek,
+    required int startHour,
+    required int startMinute,
+    required int endHour,
+    required int endMinute,
+  }) async {
+    try {
+      entry.subjectName = subjectName;
+      entry.location = location;
+      entry.dayOfWeek = dayOfWeek;
+      entry.startHour = startHour;
+      entry.startMinute = startMinute;
+      entry.endHour = endHour;
+      entry.endMinute = endMinute;
+
+      await _repository.updateEntry(entry);
+      if (dayOfWeek == _dayOfWeek || entry.dayOfWeek == _dayOfWeek) {
+        await loadEntries();
+      }
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
+  }
+
   Future<void> deleteEntry(int id) async {
     try {
       await _repository.deleteEntry(id);
