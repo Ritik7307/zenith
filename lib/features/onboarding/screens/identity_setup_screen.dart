@@ -58,7 +58,9 @@ class _IdentitySetupScreenState extends ConsumerState<IdentitySetupScreen> {
               const SizedBox(height: 48),
               TextField(
                 controller: _identityController,
-                style: Theme.of(context).textTheme.headlineSmall,
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
                 decoration: InputDecoration(
                   hintText: 'Enter your name...',
                   hintStyle: Theme.of(context).textTheme.headlineSmall?.copyWith(

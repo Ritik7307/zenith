@@ -16,7 +16,7 @@ class AppTheme {
         onSecondary: Colors.white,
         onSurface: Color(0xFF1C1C1C), // Very dark grey text
       ),
-      textTheme: GoogleFonts.interTextTheme().copyWith(
+      textTheme: GoogleFonts.interTextTheme(ThemeData.light().textTheme).copyWith(
         displayLarge: GoogleFonts.inter(fontSize: 32, fontWeight: FontWeight.w800, color: const Color(0xFF1C1C1C)),
         displayMedium: GoogleFonts.inter(fontSize: 28, fontWeight: FontWeight.w700, color: const Color(0xFF1C1C1C)),
         titleLarge: GoogleFonts.inter(fontSize: 22, fontWeight: FontWeight.w700, color: const Color(0xFF1C1C1C)),
@@ -56,7 +56,7 @@ class AppTheme {
         onSecondary: Color(0xFF121212),
         onSurface: Color(0xFFE0E0E0),
       ),
-      textTheme: GoogleFonts.interTextTheme().copyWith(
+      textTheme: GoogleFonts.interTextTheme(ThemeData.dark().textTheme).copyWith(
         displayLarge: GoogleFonts.inter(fontSize: 32, fontWeight: FontWeight.w800, color: const Color(0xFFE0E0E0)),
         displayMedium: GoogleFonts.inter(fontSize: 28, fontWeight: FontWeight.w700, color: const Color(0xFFE0E0E0)),
         titleLarge: GoogleFonts.inter(fontSize: 22, fontWeight: FontWeight.w700, color: const Color(0xFFE0E0E0)),
